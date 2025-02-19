@@ -1,0 +1,16 @@
+name: alsa-audio-player
+
+services:
+  deploy:
+    build: .
+    working_dir: /src
+    environment:
+      - XDG_RUNTIME_DIR=/tmp
+    volumes:
+      - type: bind
+        source: /run/user/1000/pipewire-0
+        target: /tmp/pipewire-0
+      - type: bind
+        source: ./examples
+        target: /src
+    entrypoint: ./deploy_entrypoint.sh

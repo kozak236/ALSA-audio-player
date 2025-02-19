@@ -6,9 +6,3 @@ RUN apt-get update
 RUN apt-get install make build-essential alsa-base alsa-utils libasound2-dev \
     pipewire-alsa pipewire -y
 RUN apt-get clean
-
-# Add cource code
-COPY examples/ /src/
-WORKDIR /src/
-RUN make
-CMD ["./pcm", "-D", "pipewire"]
