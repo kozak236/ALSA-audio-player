@@ -2,7 +2,10 @@ name: alsa-audio-player
 
 services:
   deploy:
-    build: .
+    build:
+      context: ./build
+      dockerfile: Dockerfile
+      target: deploy
     working_dir: /src
     environment:
       - XDG_RUNTIME_DIR=/tmp
