@@ -1,12 +1,11 @@
-name: alsa-audio-player
-
 services:
-  deploy:
+  alsa-deploy:
     build:
       context: ./build
       dockerfile: Dockerfile
       target: deploy
     working_dir: /src
+    hostname: alsa-docker
     environment:
       - XDG_RUNTIME_DIR=/tmp
     volumes:
@@ -16,4 +15,13 @@ services:
       - type: bind
         source: ./examples
         target: /src
-    entrypoint: ./deploy_entrypoint.sh
+      - type: bind
+        source: ./scripts
+        target: /scripts
+    entrypoint: /scripts/deploy_entrypoint.sh
+
+  alsa-devel:
+    build:
+      target: devel
+    extends: alsa-deploy
+    entrypoint: /scripts/devel_entrypoint.sh
