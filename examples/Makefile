@@ -1,4 +1,4 @@
-OBJ := hello-world pcm
+OBJ := pcm
 
 CC = gcc
 LDLIBS = -lm -lasound
