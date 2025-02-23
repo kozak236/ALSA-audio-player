@@ -4,8 +4,8 @@ services:
       context: ./build
       dockerfile: Dockerfile
       target: deploy
-    user: user
-    working_dir: /home/user
+    user: ubuntu
+    working_dir: /home/ubuntu
     hostname: alsa-docker
     environment:
       - XDG_RUNTIME_DIR=/tmp
@@ -15,13 +15,13 @@ services:
         target: /tmp/pipewire-0
       - type: bind
         source: ../examples
-        target: /home/user/examples
+        target: /home/ubuntu/examples
       - type: bind
         source: ../src
-        target: /home/user/src
+        target: /home/ubuntu/src
       - type: bind
         source: ../audio
-        target: /home/user/audio
+        target: /home/ubuntu/audio
       - type: bind
         source: ./scripts
         target: /scripts
