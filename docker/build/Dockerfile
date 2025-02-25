@@ -20,8 +20,12 @@ FROM alsa-base AS devel
 
 # Additional devel packages
 RUN apt-get update
-RUN apt-get install neovim git wget curl unzip -y
+RUN apt-get install git wget curl unzip cmake gettext -y
 RUN apt-get clean
+
+# Install nvim (apt-get package too old for some plugins)
+RUN git clone https://github.com/neovim/neovim.git --depth 1 /tmp/neovim
+RUN cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install
 
 # Change user
 USER ubuntu
