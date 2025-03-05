@@ -8,6 +8,9 @@ class APlayer {
         APlayer(void) = delete;
         APlayer(std::string _name);
         ~APlayer(void);
+
+        // Print hardware parameters
+        void print_hw_params(void);
     private:
         // Hardware parameters
         const std::string dev_name;
@@ -26,8 +29,8 @@ class APlayer {
         static constexpr unsigned int DEV_HW_RATE = 44100;
         static constexpr unsigned int DEV_HW_BUFFER_TIME = 500000;
         static constexpr unsigned int DEV_HW_PERIOD_TIME = 100000;
-        static constexpr snd_pcm_uframes_t DEV_HW_BUFFER_SIZE = 8192; // todo: sframes?
-        static constexpr snd_pcm_uframes_t DEV_HW_PERIOD_SIZE = 1024; // todo: sframes?
+        static constexpr snd_pcm_uframes_t DEV_HW_BUFFER_SIZE = 8192;
+        static constexpr snd_pcm_uframes_t DEV_HW_PERIOD_SIZE = 1024;
         
         // Device initialization
         int init_hw_params(void) noexcept(false);

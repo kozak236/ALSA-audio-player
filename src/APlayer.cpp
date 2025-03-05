@@ -120,3 +120,15 @@ int APlayer::init_sw_params(void) noexcept(false){
 
     return 0;
 }
+
+void APlayer::print_hw_params(void){
+    std::cout << "Opened PCM: " << dev_name << std::endl;
+    std::cout << "Sample rate: " << dev_rate << std::endl;
+    std::cout << "Number of channels: " << DEV_HW_CHANNELS << std::endl;
+    std::cout << "Access type:  SND_PCM_ACCESS_RW_INTERLEAVED" << std::endl;
+    std::cout << "Sample format: SND_PCM_FORMAT_S16" << std::endl;
+    std::cout << "Buffer time " << dev_buffer_time << std::endl;
+    std::cout << "Buffer size: " << dev_buffer_size << std::endl;
+    std::cout << "Period time: " << dev_period_time << std::endl;
+    std::cout << "Period size: " << dev_period_size << std::endl;
+}

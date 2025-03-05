@@ -1,7 +1,9 @@
-#include <iostream>
 #include "APlayer.hpp"
 
 int main(int argc, char *argv[]){
+    // Create player instance
     APlayer player("pipewire");
-    std::cout << "Hello world!" << std::endl;
+
+    // Display hardware parameters
+    player.print_hw_params();
 }
