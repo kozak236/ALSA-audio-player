@@ -20,7 +20,7 @@ FROM alsa-base AS devel
 
 # Additional devel packages
 RUN apt-get update
-RUN apt-get install git wget curl unzip cmake gettext -y
+RUN apt-get install git wget curl unzip cmake gettext bsdmainutils -y
 RUN apt-get clean
 
 # Install nvim (apt-get package too old for some plugins)
