@@ -1,5 +1,5 @@
 OBJ = alsa-audio
-SOURCES = APlayer.o
+SOURCES = APlayer.o WaveAudio.o
 
 LDLIBS = -lasound
 
