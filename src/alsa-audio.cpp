@@ -8,9 +8,6 @@ int main(int argc, char *argv[]){
     // Open wave file
     WaveAudio audio("../audio/PinkPanther60.wav");
 
-    // Parse audio file
-    audio.wave_parse_source_file();
-
     // Display WAVE file properties
     audio.display_params();
 

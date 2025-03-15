@@ -4,10 +4,10 @@
 #include <stdexcept>
 
 
-static const unsigned int wave_header_name_length = 4;
-static const unsigned int wave_header_ctrl_length = 8;
-static const unsigned int wave_fmt_chunk_data_len = 16;
-static const unsigned int wave_pcm_format = 1;
+static constexpr unsigned int wave_header_name_length = 4;
+static constexpr unsigned int wave_header_ctrl_length = 8;
+static constexpr unsigned int wave_fmt_chunk_data_len = 16;
+static constexpr unsigned int wave_pcm_format = 1;
 
 
 WaveAudio::WaveAudio(std::string _name) : wave_name(_name){
@@ -23,8 +23,12 @@ WaveAudio::WaveAudio(std::string _name) : wave_name(_name){
         wave_handle.seekg(0, std::ios::end);
         io_size = wave_handle.tellg();
         wave_handle.seekg(0, std::ios::beg);
-        
-    } catch (...) {
+
+        // Parse WAVE header
+        parse_source_file();
+
+    } catch (const std::exception &e) {
+        std::cerr << "WAVE file processing error: " << std::endl;
         throw;
     }
 }
@@ -83,84 +87,57 @@ int WaveAudio::find_chunk_header(const std::string _chunk_name){
     return 0;
 }
 
-int WaveAudio::wave_parse_source_file(void){
-    // Automatic variables
+int WaveAudio::parse_source_file(void){
+    // Temporary buffer
     uint32_t data_in;
 
     // Check file type
-    if(check_chunk_header("RIFF")){
-        std::cout << "Not a WAVE file!" << std::endl;
-        return -1;
-    }
+    if(check_chunk_header("RIFF"))
+        throw std::runtime_error("Not a WAVE file!");
 
     // Get file size
-    if(read_bytes(reinterpret_cast<char *>(&wave_file_size), sizeof(wave_file_size))){
-        std::cout << "Could not read file size!" << std::endl;
-        return -1;
-    }
+    if(read_bytes(reinterpret_cast<char *>(&wave_file_size), sizeof(wave_file_size)))
+        throw std::runtime_error("Read error!");
 
     // Check file size
-    if(wave_file_size + wave_header_ctrl_length != io_size){
-        std::cout << "File length error!" << std::endl;
-        return -1;
-    }
+    if(wave_file_size + wave_header_ctrl_length != io_size)
+        throw std::runtime_error("File length error!");
 
     // Ensure that audio file is of WAVE type
-    if(check_chunk_header("WAVE")){
-        std::cout << "Not a WAVE file!" << std::endl;
-        return -1;
-    }
+    if(check_chunk_header("WAVE"))
+        throw std::runtime_error("Not a WAVE file!");
 
     // Find format chunk
-    if(find_chunk_header("fmt ")){
-        std::cout << "Chunk header \"fmt \" could not be found" << std::endl;
-    }
+    if(find_chunk_header("fmt "))
+        throw std::runtime_error("Chunk header \"fmt \" could not be found");
+
+    // Enable file exeptions
+    wave_handle.exceptions(std::ifstream::badbit | std::ifstream::failbit | std::ifstream::eofbit);
 
     // Ensure that chunk has correct size
-    if(read_bytes(reinterpret_cast<char *>(&data_in), sizeof(data_in))){
-        std::cout << "Read error!" << std::endl;
-        return -1;
-    }
-
-    if(data_in != wave_fmt_chunk_data_len){
-        std::cout << "Wrong fmt len!" << std::endl;
-        return -1;
-    }
+    wave_handle.read(reinterpret_cast<char *>(&data_in), sizeof(data_in));
+    if(data_in != wave_fmt_chunk_data_len)
+        throw std::runtime_error("Wrong fmt len!");
 
     // Ensure that format is PCM
-    if(read_bytes(reinterpret_cast<char *>(&data_in), sizeof(uint16_t))){
-        std::cout << "Read error!" << std::endl;
-        return -1;
-    }
-
-    if(static_cast<uint16_t>(data_in) != wave_pcm_format){
-        std::cout << "Wrong file format!" << std::endl;
-        return -1;
-    }
+    wave_handle.read(reinterpret_cast<char *>(&data_in), sizeof(uint16_t));
+    if(static_cast<uint16_t>(data_in) != wave_pcm_format)
+        throw std::runtime_error("Wrong file format!");
 
     // Read number of channels
-    if(read_bytes(reinterpret_cast<char *>(&wave_channels), sizeof(wave_channels))){
-        std::cout << "Read error!" << std::endl;
-        return -1;
-    }
-
+    wave_handle.read(reinterpret_cast<char *>(&wave_channels), sizeof(wave_channels));
 
     // Read sample rate
-    if(read_bytes(reinterpret_cast<char *>(&wave_sample_rate), sizeof(wave_sample_rate))){
-        std::cout << "Read error!" << std::endl;
-        return -1;
-    }
+    wave_handle.read(reinterpret_cast<char *>(&wave_sample_rate), sizeof(wave_sample_rate));
 
-    // Ignore next ten bytes
+    // Ignore bytes per second and block align
     wave_handle.ignore(sizeof(uint32_t) + sizeof(uint16_t));
-    if(wave_handle.eof())
-        return -1;
 
     // Get number of bits per sample
-    if(read_bytes(reinterpret_cast<char *>(&wave_bits_per_sample), sizeof(wave_bits_per_sample))){
-        std::cout << "Read error!" << std::endl;
-        return -1;
-    }
+    wave_handle.read(reinterpret_cast<char *>(&wave_bits_per_sample), sizeof(wave_bits_per_sample));
+
+    // Disable file exeptions
+    wave_handle.exceptions(std::ifstream::goodbit);
 
     // Wave header parsed without errors
     return 0;

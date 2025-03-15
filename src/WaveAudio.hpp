@@ -12,7 +12,6 @@ class WaveAudio {
         ~WaveAudio(void);
 
         // Wave file parser
-        int wave_parse_source_file(void);
         void display_params(void);
     private:
         // WAVE file handle
@@ -20,6 +19,7 @@ class WaveAudio {
         std::ifstream wave_handle;
 
         // File parsing
+        int parse_source_file(void);
         int check_chunk_header(const std::string _chunk_name);
         int find_chunk_header(const std::string _chunk_name);
         int read_bytes(char* _read_buff, const std::streamsize _size);
