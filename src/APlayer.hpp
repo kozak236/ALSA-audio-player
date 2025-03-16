@@ -2,6 +2,7 @@
 
 #include <string>
 #include <alsa/asoundlib.h>
+#include <vector>
 
 class APlayer {
     public:
@@ -15,11 +16,16 @@ class APlayer {
         // Hardware parameters
         const std::string dev_name;
         snd_pcm_t *dev_handle;
+        unsigned int dev_channels;
+        unsigned int dev_format;
         unsigned int dev_rate;
         unsigned int dev_buffer_time; 
         unsigned int dev_period_time; 
         snd_pcm_uframes_t dev_buffer_size;
         snd_pcm_uframes_t dev_period_size;
+
+        // Audio buffer
+        std::vector<uint8_t> sample_buff;
 
         // Hardware parameters - default values
         static constexpr unsigned int DEV_HW_RESAMPLE = 1;
@@ -35,4 +41,5 @@ class APlayer {
         // Device initialization
         int init_hw_params(void) noexcept(false);
         int init_sw_params(void) noexcept(false);
+        void init_allocate_sample_buffer(void) noexcept(false);
 };

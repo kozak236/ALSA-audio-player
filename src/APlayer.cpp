@@ -1,9 +1,11 @@
 #include "APlayer.hpp"
+#include <alsa/pcm.h>
 #include <iostream>
 
 
-APlayer::APlayer(std::string _name) : dev_name(_name), dev_rate(DEV_HW_RATE), dev_buffer_time(DEV_HW_BUFFER_TIME), 
-            dev_period_time(DEV_HW_PERIOD_TIME), dev_buffer_size(DEV_HW_BUFFER_SIZE), dev_period_size(DEV_HW_PERIOD_SIZE) {
+APlayer::APlayer(std::string _name) : dev_name(_name), dev_channels(DEV_HW_CHANNELS), dev_format(DEV_HW_FORMAT),
+            dev_rate(DEV_HW_RATE), dev_buffer_time(DEV_HW_BUFFER_TIME), dev_period_time(DEV_HW_PERIOD_TIME),
+            dev_buffer_size(DEV_HW_BUFFER_SIZE), dev_period_size(DEV_HW_PERIOD_SIZE) {
 
     // Local variables
     int err;
@@ -19,14 +21,18 @@ APlayer::APlayer(std::string _name) : dev_name(_name), dev_rate(DEV_HW_RATE), de
 
         // Set software parameters
         init_sw_params();
+
+        // Create sample vector
+        init_allocate_sample_buffer();
+
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
         throw;
     }
-    
 }
 
 APlayer::~APlayer(){
+    // Close audio device
     snd_pcm_close(dev_handle);
 }
 
@@ -119,6 +125,11 @@ int APlayer::init_sw_params(void) noexcept(false){
     snd_pcm_sw_params_free(sw_params);
 
     return 0;
+}
+
+
+void APlayer::init_allocate_sample_buffer(void) noexcept(false) {
+    sample_buff.resize((dev_period_size * DEV_HW_CHANNELS * snd_pcm_format_physical_width(DEV_HW_FORMAT)) / 8);
 }
 
 void APlayer::print_hw_params(void){
