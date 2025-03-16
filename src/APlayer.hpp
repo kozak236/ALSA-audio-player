@@ -7,8 +7,10 @@
 
 class APlayer {
     public:
-        APlayer(void) = delete;
+        // Special class members
         APlayer(std::string _name, unsigned int _channels, snd_pcm_format_t _format, unsigned int _rate);
+        APlayer(const APlayer&) = delete;
+        const APlayer& operator=(const APlayer &) = delete;
         ~APlayer(void);
 
         // Print hardware parameters

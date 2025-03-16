@@ -9,6 +9,8 @@ class WaveAudio {
     public:
         // Constructors, destructors and others
         WaveAudio(std::string _name);
+        WaveAudio(const WaveAudio&) = delete;
+        const WaveAudio& operator=(const WaveAudio&) = delete;
         ~WaveAudio(void);
 
         // Wave file parser
