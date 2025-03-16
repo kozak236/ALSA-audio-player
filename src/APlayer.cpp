@@ -3,8 +3,9 @@
 #include <iostream>
 
 
-APlayer::APlayer(std::string _name) : dev_name(_name), dev_channels(DEV_HW_CHANNELS), dev_format(DEV_HW_FORMAT),
-            dev_rate(DEV_HW_RATE), dev_buffer_time(DEV_HW_BUFFER_TIME), dev_period_time(DEV_HW_PERIOD_TIME),
+APlayer::APlayer(std::string _name, unsigned int _channels, snd_pcm_format_t _format, unsigned int _rate) :
+            dev_name(_name), dev_channels(_channels), dev_format(_format), dev_rate(_rate),
+            dev_buffer_time(DEV_HW_BUFFER_TIME), dev_period_time(DEV_HW_PERIOD_TIME),
             dev_buffer_size(DEV_HW_BUFFER_SIZE), dev_period_size(DEV_HW_PERIOD_SIZE) {
 
     // Local variables
@@ -58,11 +59,11 @@ int APlayer::init_hw_params(void) noexcept(false){
         throw std::runtime_error(std::string("Set access type: ") + snd_strerror(err));
 
     // Set sample format
-    if((err = snd_pcm_hw_params_set_format(dev_handle, hw_params, DEV_HW_FORMAT)) < 0)
+    if((err = snd_pcm_hw_params_set_format(dev_handle, hw_params, dev_format)) < 0)
         throw std::runtime_error(std::string("Set format: ") + snd_strerror(err));
 
     // Set number of channels
-    if((err = snd_pcm_hw_params_set_channels(dev_handle, hw_params, DEV_HW_CHANNELS)) < 0)
+    if((err = snd_pcm_hw_params_set_channels(dev_handle, hw_params, dev_channels)) < 0)
         throw std::runtime_error(std::string("Set channels: ") + snd_strerror(err));
 
     // Set rate
@@ -129,7 +130,7 @@ int APlayer::init_sw_params(void) noexcept(false){
 
 
 void APlayer::init_allocate_sample_buffer(void) noexcept(false) {
-    sample_buff.resize((dev_period_size * DEV_HW_CHANNELS * snd_pcm_format_physical_width(DEV_HW_FORMAT)) / 8);
+    sample_buff.resize((dev_period_size * dev_channels * snd_pcm_format_physical_width(dev_format)) / 8);
 }
 
 void APlayer::print_hw_params(void){
@@ -138,9 +139,9 @@ void APlayer::print_hw_params(void){
     std::cout << "---------------------------" << std::endl;
     std::cout << "Opened PCM: " << dev_name << std::endl;
     std::cout << "Sample rate: " << dev_rate << std::endl;
-    std::cout << "Number of channels: " << DEV_HW_CHANNELS << std::endl;
+    std::cout << "Number of channels: " << dev_channels << std::endl;
     std::cout << "Access type:  SND_PCM_ACCESS_RW_INTERLEAVED" << std::endl;
-    std::cout << "Sample format: SND_PCM_FORMAT_S16" << std::endl;
+    std::cout << "Sample format: " << dev_format << std::endl;
     std::cout << "Buffer time: " << dev_buffer_time << std::endl;
     std::cout << "Buffer size: " << dev_buffer_size << std::endl;
     std::cout << "Period time: " << dev_period_time << std::endl;

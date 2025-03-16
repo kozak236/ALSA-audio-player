@@ -13,6 +13,11 @@ class WaveAudio {
 
         // Wave file parser
         void display_params(void);
+
+        // Getters
+        uint16_t get_wave_channels(void) const { return wave_channels; }
+        uint32_t get_wave_sample_rate(void) const { return wave_sample_rate; }
+        uint16_t get_wave_bits_per_sample(void) const { return wave_bits_per_sample; }
     private:
         // WAVE file handle
         const std::string wave_name;
